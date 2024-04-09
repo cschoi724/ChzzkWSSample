@@ -14,11 +14,12 @@ class StarscreamClient {
     var delegate: WebSocketDelegate!
     
     func connect() {
-        guard let url = URL(string: "wss://kr-ss1.chat.naver.com/chat") else {
+        let rand = Int.random(in: 1...10)
+        guard let url = URL(string: "wss://kr-ss\(rand).chat.naver.com/chat") else {
             return
         }
         var request = URLRequest(url: url)
-        request.allHTTPHeaderFields = [:]
+        //request.allHTTPHeaderFields = [:]
         webSocket = WebSocket(request: request)
         
         webSocket.delegate = delegate

@@ -70,10 +70,8 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         drawLayout()
-        let cookie = JsonLoader.load(type: NIDCookie.self, fileName: "Cookie")
         client = ChatClient(
-            streamerID: "dcd75ef0f2c664e3270de18696ad43bf",
-            nidCookie: cookie!
+            streamerID: "ef4e42dfe55e1eb07def734aecaa8688"
         )
         client.delegate = self
         NotificationCenter.default.addObserver(

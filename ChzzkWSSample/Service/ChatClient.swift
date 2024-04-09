@@ -16,7 +16,6 @@ protocol ChatClientDelegate {
 
 class ChatClient {
     var streamerID: String
-    var nidCookie: NIDCookie
     var chatInfo: ChatInfo!
     var channelInfo: ChannelInfo!
     var userStatus: UserStatus!
@@ -25,18 +24,16 @@ class ChatClient {
     var sid: String = ""
     
     init(
-        streamerID: String,
-        nidCookie: NIDCookie
+        streamerID: String
     ) {
         self.streamerID = streamerID
-        self.nidCookie = nidCookie
         self.client = StarscreamClient()
         self.client.delegate = self
         self.setup()
     }
     
     func setup() {
-        API.shared.getStatus(cookies: nidCookie) { userStatus in
+        API.shared.getStatus() { userStatus in
             self.userStatus = userStatus
         }
         
@@ -62,12 +59,12 @@ class ChatClient {
             "cmd": Command.connect.rawValue,
             "svcid": "game",
             "cid": channelInfo.chatChannelId,
-            "tid": "1",
+            "tid": 1,
             "bdy": [
                 "uid": userStatus.userIdHash,
                 "devType": 2001,
                 "accTkn": chatInfo.accessToken,
-                "auth": "READ"
+                "auth": userStatus.userIdHash.isEmpty ? "READ" : "SEND"
             ]
         ]
         if let string = request.jsonString {
@@ -122,6 +119,7 @@ class ChatClient {
             "retry" : false,
             "sid"   : sid,
             "bdy"   : [
+                //"uid" : userStatus.userIdHash,
                 "msg"           : msg,
                 "msgTypeCode"   : 1,
                 "extras"        : [
@@ -131,7 +129,7 @@ class ChatClient {
                     "extraToken"        : chatInfo.extraToken,
                     "streamingChannelId": channelInfo.chatChannelId
                 ],
-                "msgTime"       : 0
+                "msgTime"       : Int(Date().timeIntervalSince1970)
             ]
         ]
 
@@ -165,7 +163,8 @@ extension ChatClient: WebSocketDelegate {
             case .connected:
                 if let sid: String = dic.valueForKeyPath("bdy.sid") {
                     self.sid = sid
-                    requestRecentChat(sid: sid)
+                    print(sid)
+                    //requestRecentChat(sid: sid)
                 }
             case .messageList:
                 break
